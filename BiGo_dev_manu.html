@@ -1690,11 +1690,11 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This notebook includes procedures for analyzing data desribed in --- In theory, anyone should be able to reproduce our work in IPython, if they have the following software installed. * BSMAP * R module for IPython * SQLShare python client</p>
+<p>This notebook includes procedures for analyzing data desribed in --- In theory, anyone should be able to reproduce our work in IPython, if they have the following software installed. * BSMAP * rpy2 (interface to R from Python) * SQLShare python client</p>
 <p>The analysis was originally done on the Mac OSX operating system.</p>
 <p>The general premise of how this framework is set-up is that you will provide iminimal information including a working directory and location of software. The following image denotes need for user input. <img src="img/input.png" /> Otherwise you should just be able to run each cell in order (shift-enter).</p>
 <p>The intent is to clone the github repository local and run so accompaning scripts, etc. are available.</p>
-<p>The notebook is divided into X sections * <a href="#Downloading-Files">Downloading data</a> * BSMAP * Global differences (methylkit) * Differentially methylated loci</p>
+<p>The notebook is divided into X sections * <a href="#Downloading-Files">Downloading data</a> * <a href="#Running-BSMAP">BSMAP</a> * Global differences (methylkit) * Differentially methylated loci</p>
 <p>Please post any comments and questions in issues.</p>
 </div>
 </div>
@@ -1926,6 +1926,15 @@ In&nbsp;[5]:
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
@@ -1933,7 +1942,9 @@ In&nbsp;[6]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="n">lib</span><span class="o">=</span><span class="s">&quot;M1&quot;</span>
+<div class="highlight"><pre><span class="c">#given the format of fastq files (i.e. mcf_T1D3_R1.fastq) we will set variable of libraries, run bsmap </span>
+<span class="c">#optionally you can set # of threads &#39;-p&#39;</span>
+<span class="n">lib</span><span class="o">=</span><span class="s">&quot;M1&quot;</span>
 </pre></div>
 
 </div>
@@ -3580,15 +3591,6 @@ total 8808414 valid mappings, 51732152 covered cytosines, average coverage: 1.69
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Converting methratio files for methylkit</strong></p>
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
@@ -3667,46 +3669,6 @@ BEGIN{ print &quot;chr.Base\tchr\tbase\tstrand\tcoverage\tfreqC\tfreqT&quot; }
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[30]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;M1&quot;</span><span class="p">,</span><span class="s">&quot;T1D3&quot;</span><span class="p">,</span><span class="s">&quot;T1D5&quot;</span><span class="p">,</span> <span class="s">&quot;M3&quot;</span><span class="p">,</span> <span class="s">&quot;T3D3&quot;</span><span class="p">,</span> <span class="s">&quot;T3D5&quot;</span><span class="p">):</span>
-    <span class="err">!</span><span class="n">echo</span> <span class="p">{</span><span class="n">i</span><span class="p">}</span>
-    <span class="err">!</span><span class="n">grep</span> <span class="s">&quot;[A-Z][A-Z]CG[A-Z]&quot;</span> <span class="o">&lt;</span><span class="n">methratio_out_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span><span class="o">&gt;</span> <span class="n">methratio_out_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="n">CG</span><span class="o">.</span><span class="n">txt</span>
-    <span class="err">!</span><span class="n">awk</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">mr3x</span><span class="o">.</span><span class="n">awk</span> <span class="n">methratio_out_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="n">CG</span><span class="o">.</span><span class="n">txt</span> <span class="o">&gt;</span> <span class="n">mr3x</span><span class="o">.</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span>
-    <span class="err">!</span><span class="n">awk</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">mr_gg</span><span class="o">.</span><span class="n">awk</span><span class="o">.</span><span class="n">sh</span> <span class="n">mr3x</span><span class="o">.</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span> <span class="o">&gt;</span> <span class="n">mkfmt_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-M1
-T1D3
-T1D5
-M3
-T3D3
-T3D5
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
@@ -3717,6 +3679,45 @@ T3D5
 </div>
 </div>
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Converting methratio files for methylkit</strong></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="c">#first methratio files are converted to filter for CG context, 3x coverage (mr3x.awk), and reformatting (mr_gg.awk.sh).</span>
+<span class="c">#due to issue passing variable to awk, simple scripts were used (included in repository)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;M1&quot;</span><span class="p">,</span><span class="s">&quot;T1D3&quot;</span><span class="p">,</span><span class="s">&quot;T1D5&quot;</span><span class="p">,</span> <span class="s">&quot;M3&quot;</span><span class="p">,</span> <span class="s">&quot;T3D3&quot;</span><span class="p">,</span> <span class="s">&quot;T3D5&quot;</span><span class="p">):</span>
+    <span class="err">!</span><span class="n">echo</span> <span class="p">{</span><span class="n">i</span><span class="p">}</span>
+    <span class="err">!</span><span class="n">grep</span> <span class="s">&quot;[A-Z][A-Z]CG[A-Z]&quot;</span> <span class="o">&lt;</span><span class="n">methratio_out_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span><span class="o">&gt;</span> <span class="n">methratio_out_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="n">CG</span><span class="o">.</span><span class="n">txt</span>
+    <span class="err">!</span><span class="n">awk</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">mr3x</span><span class="o">.</span><span class="n">awk</span> <span class="n">methratio_out_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="n">CG</span><span class="o">.</span><span class="n">txt</span> <span class="o">&gt;</span> <span class="n">mr3x</span><span class="o">.</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span>
+    <span class="err">!</span><span class="n">awk</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">mr_gg</span><span class="o">.</span><span class="n">awk</span><span class="o">.</span><span class="n">sh</span> <span class="n">mr3x</span><span class="o">.</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span> <span class="o">&gt;</span> <span class="n">mkfmt_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Running R &gt; methylkit</strong></p>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
@@ -3891,38 +3892,6 @@ The following object is masked from ‘package:data.table’:
 </pre>
 </div>
 
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[29]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="n">ls</span> <span class="n">mkfmt</span><span class="o">*</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-mkfmt_CgM1.txt    mkfmt_CgM3.txt    mkfmt_CgT1D3.txt  mkfmt_CgT1D5.txt  mkfmt_CgT3D3.txt  mkfmt_CgT3D5.txt
-mkfmt_CgM1txt     mkfmt_CgM3txt     mkfmt_CgT1D3txt   mkfmt_CgT1D5txt   mkfmt_CgT3D3txt   mkfmt_CgT3D5txt
-
-</pre>
-</div>
 </div>
 
 </div>
