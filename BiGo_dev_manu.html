@@ -1690,11 +1690,11 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This notebook includes procedures for analyzing data desribed in --- In theory, anyone should be able to reproduce our work in IPython, if they have the following software installed. * BSMAP * rpy2 (interface to R from Python) * SQLShare python client</p>
+<p>This notebook includes procedures for analyzing data desribed in --- In theory, anyone should be able to reproduce our work in IPython, if they have the following software installed. * wget * BSMAP * rpy2 (interface to R from Python) * SQLShare python client</p>
 <p>The analysis was originally done on the Mac OSX operating system.</p>
 <p>The general premise of how this framework is set-up is that you will provide iminimal information including a working directory and location of software. The following image denotes need for user input. <img src="img/input.png" /> Otherwise you should just be able to run each cell in order (shift-enter).</p>
 <p>The intent is to clone the github repository local and run so accompaning scripts, etc. are available.</p>
-<p>The notebook is divided into X sections * <a href="#Downloading-Files">Downloading data</a> * <a href="#Running-BSMAP">BSMAP</a> * Global differences (methylkit) * Differentially methylated loci</p>
+<p>The notebook is divided into X sections * <a href="#Downloading-Files">Downloading data</a> * <a href="#Running-BSMAP">Read aligning: BSMAP</a> * <a href="#Global-Differences:-methylkit">Global differences: methylkit</a> * <a href="#Differentially-methylated-loci">Differentially methylated loci</a> * <a href="#Genomic-location-of-DMLs">Genomic location of DMLs: bedtools</a></p>
 <p>Please post any comments and questions in issues.</p>
 </div>
 </div>
@@ -1723,32 +1723,15 @@ div#notebook {
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[2]:
+In&nbsp;[26]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
 <div class="highlight"><pre><span class="c">#The first thing you will need to do is set a working directory. Simply include the path to your working directory within quotes.</span>
-<span class="n">lwd</span><span class="o">=</span><span class="s">&quot;/Volumes/Bay3_scratch/BiGo_manny&quot;</span>
+<span class="n">lwd</span><span class="o">=</span><span class="s">&quot;/Users/sr320/Desktop&quot;</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-/bin/sh: -c: line 0: syntax error near unexpected token &#96;img/input.png&apos;
-/bin/sh: -c: line 0: &#96;[](img/input.png)&apos;
-
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -1756,12 +1739,11 @@ In&nbsp;[2]:
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[4]:
+In&nbsp;[27]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="c">#change to local workding directory</span>
-<span class="n">cd</span> <span class="p">{</span><span class="n">lwd</span><span class="p">}</span>
+<div class="highlight"><pre><span class="n">cd</span> <span class="p">{</span><span class="n">lwd</span><span class="p">}</span>
 </pre></div>
 
 </div>
@@ -1775,7 +1757,7 @@ In&nbsp;[4]:
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>
-/Volumes/Bay3_scratch/BiGo_manny
+/Users/sr320/Desktop
 
 </pre>
 </div>
@@ -3591,90 +3573,12 @@ total 8808414 valid mappings, 51732152 covered cytosines, average coverage: 1.69
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[39]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>cat ./scripts/mr3x.awk
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-#!/usr/bin/awk -f
-
-!awk {if ($8 &gt;= 3) print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12}
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[40]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>cat ./scripts/mr_gg.awk.sh
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-#!/usr/bin/awk -f
-
-BEGIN{ print &quot;chr.Base\tchr\tbase\tstrand\tcoverage\tfreqC\tfreqT&quot; }
-{
-	if ($3 == &quot;+&quot;) {
-		strand=&quot;F&quot;
- 	} else {
-		strand=&quot;R&quot;
-	}
-
-	FC=($7/$8)*100
-	FT=(1-($7/$8))*100
-	chrbase=$1&quot;.&quot;$2
-	printf &quot;%s\t%s\t%s\t%s\t%d\t%.2f\t%.2f\n&quot;,
-		chrbase, $1, $2, strand, $8, FC, FT
-}
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Methylkit">Methylkit<a class="anchor-link" href="#Methylkit">&#182;</a></h1>
+<h1 id="Global-Differences:-methylkit">Global Differences: methylkit<a class="anchor-link" href="#Global-Differences:-methylkit">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -7150,7 +7054,7 @@ WS7w/wFwtCrLXCa59QAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="ID-target-loci">ID target loci<a class="anchor-link" href="#ID-target-loci">&#182;</a></h1>
+<h1 id="Differentially-methylated-loci">Differentially methylated loci<a class="anchor-link" href="#Differentially-methylated-loci">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -7160,14 +7064,14 @@ WS7w/wFwtCrLXCa59QAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Summary: methration files filtered for CG and 3x coverage will be sligthly modified and uploaded to SQLshare for querying.</p>
+<p>Summary: methratio files filtered for CG and 3x coverage (see above) will be sligthly modified and uploaded to SQLshare for querying.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[40]:
+In&nbsp;[4]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
@@ -7186,53 +7090,10 @@ In&nbsp;[40]:
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>
-C12768 103 + TTCGT 0.167 6.00 1 6 6 6 0.030 0.564
-C12768 119 + TTCGT 0.250 4.00 1 4 4 4 0.046 0.699
-C12768 145 + TTCGT 0.000 3.00 0 3 3 3 0.000 0.562
-C12806 56 + AACGA 0.000 4.00 0 4 4 4 0.000 0.490
-C12806 76 + ATCGC 0.200 5.00 1 5 5 5 0.036 0.624
-C12806 78 + CGCGT 0.200 5.00 1 5 5 5 0.036 0.624
-C12806 105 + ATCGG 0.250 4.00 1 4 5 5 0.046 0.699
-C12806 142 + ATCGG 0.375 8.00 3 8 8 8 0.137 0.694
-C12924 19 + AACGA 0.000 4.00 0 4 4 4 0.000 0.490
-C12924 30 + ATCGT 0.000 4.00 0 5 4 5 0.000 0.490
+head: mr3x.M1.txt: No such file or directory
 
 </pre>
 </div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[200]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="n">pwd</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt output_prompt">
-    Out[200]:</div>
-
-
-<div class="output_text output_subarea output_pyout">
-<pre>
-u&apos;/Volumes/Bay3 scratch/BiGo_manny&apos;
-</pre>
-</div>
-
 </div>
 
 </div>
@@ -7283,44 +7144,12 @@ T3D5
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[60]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="c">#fyi</span>
-<span class="o">!</span>cat ./scripts/psqls.awk
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-#!/usr/bin/awk -f
-
-!awk {print ($1&quot;.&quot;$2),$5}
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
 In&nbsp;[344]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head sqlr_M1.txt
+<div class="highlight"><pre><span class="c">#examplet of output</span>
+<span class="o">!</span>head sqlr_M1.txt
 </pre></div>
 
 </div>
@@ -7353,47 +7182,17 @@ C12924.19 0.000
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[447]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>wc -l sqlr_M1.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
- 1212738 sqlr_M1.txt
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="SQLShare">SQLShare<a class="anchor-link" href="#SQLShare">&#182;</a></h1>
+<div class="figure">
+<img src="img/input.png" />
 </div>
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
@@ -7401,7 +7200,8 @@ In&nbsp;[43]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="c">#set locaiton of sqlshare python </span>
+<div class="highlight"><pre><span class="c">#now files will be uploaded to sqlshare using python client (https://github.com/uwescience/sqlshare-pythonclient)</span>
+<span class="c">#set locaiton of sqlshare python </span>
 <span class="n">pt</span><span class="o">=</span><span class="s">&quot;/Users/sr320/sqlshare-pythonclient/tools/&quot;</span>
 </pre></div>
 
@@ -7449,6 +7249,26 @@ Successfully uploaded sqlr_T3D3.txt
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="determining-lineage-specific-dmls">Determining Lineage Specific DMLs</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="figure">
+<img src="img/input.png" />
+</div>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
@@ -7456,136 +7276,13 @@ In&nbsp;[426]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([M1ratio]+[T1D3ratio]+[T1D5ratio])/3 as mean1 FROM [sr320@washington.edu].[sqlr_M1.txt]m1 inner join [sr320@washington.edu].[sqlr_T1D5.txt]t1d5 on m1.loci=t1d5.loci inner join [sr320@washington.edu].[sqlr_T1D3.txt]t1d3 on m1.loci=t1d3.loci where [M1ratio]-(([M1ratio]+[T1D3ratio]+[T1D5ratio])/3) &lt; abs(.2) and [T1D3ratio]-(([M1ratio]+[T1D3ratio]+[T1D5ratio])/3) &lt; abs(.2) and [T1D5ratio]-(([M1ratio]+[T1D3ratio]+[T1D5ratio])/3) &lt; abs(.2)&quot;</span> -f tsv -o cglarv_lineage_1.txt
+<div class="highlight"><pre><span class="c">#downloading query for loci similar throughout a lineage- </span>
+<span class="c">#when methylation level at a loci was less than 0.2 from mean across the three samples (ie sperm, 70hpf, 150hpf). </span>
+<span class="c">#for lineage 1</span>
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([M1ratio]+[T1D3ratio]+[T1D5ratio])/3 as mean1 FROM [sr320@washington.edu].[sqlr_M1.txt]m1 inner join [sr320@washington.edu].[sqlr_T1D5.txt]t1d5 on m1.loci=t1d5.loci inner join [sr320@washington.edu].[sqlr_T1D3.txt]t1d3 on m1.loci=t1d3.loci where [M1ratio]-(([M1ratio]+[T1D3ratio]+[T1D5ratio])/3) &lt; abs(.2) and [T1D3ratio]-(([M1ratio]+[T1D3ratio]+[T1D5ratio])/3) &lt; abs(.2) and [T1D5ratio]-(([M1ratio]+[T1D3ratio]+[T1D5ratio])/3) &lt; abs(.2)&quot;</span> -f tsv -o cglarv_lineage_1.txt
 </pre></div>
 
 </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[427]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([M1ratio]+[T1D3ratio]+[T1D5ratio])/3 as mean1 FROM [sr320@washington.edu].[sqlr_M1.txt]m1 inner join [sr320@washington.edu].[sqlr_T1D5.txt]t1d5 on m1.loci=t1d5.loci inner join [sr320@washington.edu].[sqlr_T1D3.txt]t1d3 on m1.loci=t1d3.loci&quot;</span> -f tsv -o tocountlarv_lineage_1.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[428]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head tocountlarv_lineage_1.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-
-
-
-
-
-
-
-
-
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[429]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>wc -l tocountlarv_lineage_1.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-   69313 tocountlarv_lineage_1.txt
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[430]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head cglarv_lineage_1.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-
-
-
-
-
-
-
-
-
-
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -7597,50 +7294,11 @@ In&nbsp;[431]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([M3ratio]+[T3D3ratio]+[T3D5ratio])/3 as mean3 FROM [sr320@washington.edu].[sqlr_M3.txt]M3 inner join [sr320@washington.edu].[sqlr_T3D5.txt]T3D5 on M3.loci=T3D5.loci inner join [sr320@washington.edu].[sqlr_T3D3.txt]T3D3 on M3.loci=T3D3.loci where [M3ratio]-(([M3ratio]+[T3D3ratio]+[T3D5ratio])/3) &lt; abs(.2) and [T3D3ratio]-(([M3ratio]+[T3D3ratio]+[T3D5ratio])/3) &lt; abs(.2) and [T3D5ratio]-(([M3ratio]+[T3D3ratio]+[T3D5ratio])/3) &lt; abs(.2)&quot;</span> -f tsv -o cglarv_lineage_3.txt
+<div class="highlight"><pre><span class="c">#for lineage 3</span>
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([M3ratio]+[T3D3ratio]+[T3D5ratio])/3 as mean3 FROM [sr320@washington.edu].[sqlr_M3.txt]M3 inner join [sr320@washington.edu].[sqlr_T3D5.txt]T3D5 on M3.loci=T3D5.loci inner join [sr320@washington.edu].[sqlr_T3D3.txt]T3D3 on M3.loci=T3D3.loci where [M3ratio]-(([M3ratio]+[T3D3ratio]+[T3D5ratio])/3) &lt; abs(.2) and [T3D3ratio]-(([M3ratio]+[T3D3ratio]+[T3D5ratio])/3) &lt; abs(.2) and [T3D5ratio]-(([M3ratio]+[T3D3ratio]+[T3D5ratio])/3) &lt; abs(.2)&quot;</span> -f tsv -o cglarv_lineage_3.txt
 </pre></div>
 
 </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[432]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head cglarv_lineage_3.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-
-
-
-
-
-
-
-
-
-
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -7652,7 +7310,8 @@ In&nbsp;[433]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;1&quot;</span><span class="p">,</span><span class="s">&quot;3&quot;</span><span class="p">):</span>
+<div class="highlight"><pre><span class="c">#reformat files</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;1&quot;</span><span class="p">,</span><span class="s">&quot;3&quot;</span><span class="p">):</span>
     <span class="err">!</span><span class="n">echo</span> <span class="p">{</span><span class="n">i</span><span class="p">}</span>
     <span class="err">!</span><span class="n">awk</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">joinr</span><span class="o">.</span><span class="n">awk</span> <span class="n">cglarv_lineage_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span> <span class="o">&gt;</span> <span class="n">cglarv_lineage_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="n">trm</span><span class="o">.</span><span class="n">txt</span>
     <span class="err">!</span><span class="n">sed</span> <span class="s">&#39;s/loci/loci{i}/g&#39;</span> <span class="o">&lt;</span><span class="n">cglarv_lineage_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="n">trm</span><span class="o">.</span><span class="n">txt</span><span class="o">&gt;</span> <span class="n">sq_cglarv_lineage_</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="o">.</span><span class="n">txt</span>
@@ -7683,91 +7342,12 @@ In&nbsp;[433]:
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[434]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head sq_cglarv_lineage_1.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-
-
-
-
-
-
-
-
-
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[435]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head sq_cglarv_lineage_3.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-
-
-
-
-
-
-
-
-
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
 In&nbsp;[436]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>multiupload.py sq_cglarv_*
+<div class="highlight"><pre><span class="o">!</span>#uploading lineage files up to SQLShare to query
+<span class="n">python</span> <span class="p">{</span><span class="n">pt</span><span class="p">}</span><span class="n">multiupload</span><span class="o">.</span><span class="n">py</span> <span class="n">sq_cglarv_</span><span class="o">*</span>
 </pre></div>
 
 </div>
@@ -7811,97 +7391,11 @@ In&nbsp;[437]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, abs(mean1 - mean3) as meandiff FROM [sr320@washington.edu].[sq_cglarv_lineage_1.txt]c1 inner join [sr320@washington.edu].[sq_cglarv_lineage_3.txt]c3 on c1.loci1=c3.loci3 where abs(mean1 - mean3) &gt;= 0.3&quot;</span> -f tsv -o cglarv_lineage_differ.txt
+<div class="highlight"><pre><span class="c">#query to find loci where mean methylation ratio is at least 0.3 different across lineages</span>
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, abs(mean1 - mean3) as meandiff FROM [sr320@washington.edu].[sq_cglarv_lineage_1.txt]c1 inner join [sr320@washington.edu].[sq_cglarv_lineage_3.txt]c3 on c1.loci1=c3.loci3 where abs(mean1 - mean3) &gt;= 0.3&quot;</span> -f tsv -o cglarv_lineage_differ.txt
 </pre></div>
 
 </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[443]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="c">#QC check commmon loci</span>
-<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, abs(mean1 - mean3) as meandiff FROM [sr320@washington.edu].[sq_cglarv_lineage_1.txt]c1 inner join [sr320@washington.edu].[sq_cglarv_lineage_3.txt]c3 on c1.loci1=c3.loci3&quot;</span> -f tsv -o commonloci.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[445]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head commonloci.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-
-
-
-
-
-
-
-
-
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[446]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>wc -l commonloci.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-   35475 commonloci.txt
-
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -7913,7 +7407,8 @@ In&nbsp;[438]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>head cglarv_lineage_differ.txt
+<div class="highlight"><pre><span class="c">#checking file </span>
+<span class="o">!</span>head cglarv_lineage_differ.txt
 </pre></div>
 
 </div>
@@ -7949,11 +7444,340 @@ In&nbsp;[438]:
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
+In&nbsp;[10]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="o">!</span>wc -l cglarv_lineage_differ.txt
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+     484 /Volumes/Bay3_scratch/BiGo_manny/cglarv_lineage_differ.txt
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="determining-developmental-dmls">Determining Developmental DMLs</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[466]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="c">#setting some variables</span>
+<span class="n">out</span><span class="o">=</span><span class="s">&quot;sperm&quot;</span>
+<span class="n">r1</span><span class="o">=</span><span class="s">&quot;M1&quot;</span>
+<span class="n">r2</span><span class="o">=</span><span class="s">&quot;M3&quot;</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[468]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="c">#query to first identify loci in biological replicates (both sperm samples) where methylation is similar</span>
+<span class="c">#specifically loci where the ratio of each rep was not greater than 0.2 different from mean ratio</span>
+<span class="c">#new file created in SQLShare add be downloading / uploading.</span>
+<span class="c">#below this is done for each sample pair</span>
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([{r2}ratio]+[{r1}ratio])/2 as mean_{out} FROM [sr320@washington.edu].[sqlr_{r1}.txt]{r1} inner join [sr320@washington.edu].[sqlr_{r2}.txt]{r2} on {r1}.loci={r2}.loci where [{r1}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2) and [{r2}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2)&quot;</span> -f tsv -o br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>wc -l br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>head br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>singleupload.py br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+  421561 br_cglarv_sperm.txt
+
+
+
+
+
+
+
+
+
+
+processing chunk line 0 to 421561 (0.26978302002 s elapsed)
+pushing br_cglarv_sperm.txt...
+parsing 2396B0BE...
+finished br_cglarv_sperm.txt
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[469]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="n">out</span><span class="o">=</span><span class="s">&quot;day3&quot;</span>
+<span class="n">r1</span><span class="o">=</span><span class="s">&quot;T1D3&quot;</span>
+<span class="n">r2</span><span class="o">=</span><span class="s">&quot;T3D3&quot;</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[470]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([{r2}ratio]+[{r1}ratio])/2 as mean_{out} FROM [sr320@washington.edu].[sqlr_{r1}.txt]{r1} inner join [sr320@washington.edu].[sqlr_{r2}.txt]{r2} on {r1}.loci={r2}.loci where [{r1}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2) and [{r2}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2)&quot;</span> -f tsv -o br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>wc -l br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>head br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>singleupload.py br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+  108870 br_cglarv_day3.txt
+
+
+
+
+
+
+
+
+
+
+processing chunk line 0 to 108870 (0.104866027832 s elapsed)
+pushing br_cglarv_day3.txt...
+parsing 876A9D68...
+finished br_cglarv_day3.txt
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[471]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="n">out</span><span class="o">=</span><span class="s">&quot;day5&quot;</span>
+<span class="n">r1</span><span class="o">=</span><span class="s">&quot;T1D5&quot;</span>
+<span class="n">r2</span><span class="o">=</span><span class="s">&quot;T3D5&quot;</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[477]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([{r2}ratio]+[{r1}ratio])/2 as mean_{out} FROM [sr320@washington.edu].[sqlr_{r1}.txt]{r1} inner join [sr320@washington.edu].[sqlr_{r2}.txt]{r2} on {r1}.loci={r2}.loci where [{r1}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2) and [{r2}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2)&quot;</span> -f tsv -o br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>wc -l br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>head br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>singleupload.py br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+  302492 br_cglarv_day5.txt
+
+
+
+
+
+
+
+
+
+
+processing chunk line 0 to 302492 (0.181667089462 s elapsed)
+pushing br_cglarv_day5.txt...
+parsing A941BD6C...
+finished br_cglarv_day5.txt
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[8]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="c">#query to ID loci that where at least one development time point is different (&gt;0.4 methylation ratio) </span>
+<span class="c">#this was performed on loci that were similar among biological reps </span>
+<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, sperm.mean_sperm-d3.mean_day3 as &#39;s-3&#39;, sperm.mean_sperm-d5.mean_day5 as &#39;s-5&#39;, d3.mean_day3-d5.mean_day5 as &#39;3-5&#39; FROM [sr320@washington.edu].[br_cglarv_sperm.txt]sperm inner join [sr320@washington.edu].[br_cglarv_day3.txt]d3 on sperm.loci=d3.loci inner join [sr320@washington.edu].[br_cglarv_day5.txt]d5 on sperm.loci=d5.loci where abs(sperm.mean_sperm-d3.mean_day3) &gt; 0.4 or abs(sperm.mean_sperm-d5.mean_day5) &gt; 0.4 or abs(d3.mean_day3-d5.mean_day5) &gt; 0.4&quot;</span> -f tsv -o DML_development.txt
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+python: can&apos;t open file &apos;{pt}fetchdata.py&apos;: [Errno 2] No such file or directory
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[481]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre><span class="o">!</span>wc -l DML_development.txt
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+     388 DML_development.txt
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
+In&nbsp;[]:
+</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class="highlight"><pre> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="creating-dml-bed-files">Creating DML BED files</h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">
 In&nbsp;[439]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>awk <span class="s1">&#39;{print $1}&#39;</span> cglarv_lineage_differ.txt &gt; cglarv_lin_a
+<div class="highlight"><pre><span class="c">#converting file format to create lineage specific DML</span>
+<span class="o">!</span>awk <span class="s1">&#39;{print $1}&#39;</span> cglarv_lineage_differ.txt &gt; cglarv_lin_a
 <span class="o">!</span>tail -n +2 cglarv_lin_a &gt; cglarv_lin_b
 <span class="o">!</span>tr <span class="s1">&#39;.&#39;</span> <span class="s2">&quot;\t&quot;</span> &lt;cglarv_lin_b&gt; cglarv_lin_c
 <span class="o">!</span>awk <span class="s1">&#39;{print $1, $2, ($2+1), &quot;DML_lin&quot; }&#39;</span> cglarv_lin_c  &gt; cglarv_lin_d
@@ -8036,31 +7860,64 @@ In&nbsp;[441]:
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Intersect-bed">Intersect bed<a class="anchor-link" href="#Intersect-bed">&#182;</a></h1>
-</div>
-</div>
-</div>
-
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[]:
+In&nbsp;[482]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="n">Download</span> <span class="n">oyster</span> <span class="n">genome</span> <span class="n">tracks</span>
+<div class="highlight"><pre><span class="c">#generating developmental DMR bed</span>
+<span class="o">!</span>awk <span class="s1">&#39;{print $1}&#39;</span> DML_development.txt &gt; cglarv_dd_a
+<span class="o">!</span>tail -n +2 cglarv_dd_a &gt; cglarv_dd_b
+<span class="o">!</span>tr <span class="s1">&#39;.&#39;</span> <span class="s2">&quot;\t&quot;</span> &lt;cglarv_dd_b&gt; cglarv_dd_c
+<span class="o">!</span>awk <span class="s1">&#39;{print $1, $2, ($2+1), &quot;DML_dev&quot; }&#39;</span> cglarv_dd_c  &gt; cglarv_dd_d
+<span class="o">!</span>tr <span class="s1">&#39; &#39;</span> <span class="s2">&quot;\t&quot;</span> &lt;cglarv_dd_d&gt; cglarv_development_differ.bed
+<span class="o">!</span>head cglarv_development_differ.bed
+<span class="o">!</span>wc -l cglarv_development_differ.bed
 </pre></div>
 
 </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+C22666	609	610	DML_dev
+C22666	624	625	DML_dev
+C24478	2098	2099	DML_dev
+C24478	2120	2121	DML_dev
+C24628	2236	2237	DML_dev
+C24628	473	474	DML_dev
+C26614	3295	3296	DML_dev
+C26938	1051	1052	DML_dev
+C27500	1245	1246	DML_dev
+C27928	1457	1458	DML_dev
+     387 cglarv_development_differ.bed
+
+</pre>
 </div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Genomic-location-of-DMLs">Genomic location of DMLs<a class="anchor-link" href="#Genomic-location-of-DMLs">&#182;</a></h1>
+</div>
+</div>
+</div>
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
@@ -8068,7 +7925,10 @@ In&nbsp;[]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight"><pre><span class="n">mkdir</span> <span class="n">genome_tracks</span>
+<div class="highlight"><pre><span class="c">#In order to find location of DMLs oyster genome tracks will be downloaded</span>
+<span class="c">#and intersectbed (bedtools suite) run</span>
+<span class="c">#Note track with all CG&#39;s is large (~977mb)</span>
+<span class="o">!</span>mkdir genome_tracks
 </pre></div>
 
 </div>
@@ -8243,216 +8103,6 @@ In&nbsp;[]:
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[466]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="n">out</span><span class="o">=</span><span class="s">&quot;sperm&quot;</span>
-<span class="n">r1</span><span class="o">=</span><span class="s">&quot;M1&quot;</span>
-<span class="n">r2</span><span class="o">=</span><span class="s">&quot;M3&quot;</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[468]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([{r2}ratio]+[{r1}ratio])/2 as mean_{out} FROM [sr320@washington.edu].[sqlr_{r1}.txt]{r1} inner join [sr320@washington.edu].[sqlr_{r2}.txt]{r2} on {r1}.loci={r2}.loci where [{r1}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2) and [{r2}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2)&quot;</span> -f tsv -o br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>wc -l br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>head br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>singleupload.py br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-  421561 br_cglarv_sperm.txt
-
-
-
-
-
-
-
-
-
-
-processing chunk line 0 to 421561 (0.26978302002 s elapsed)
-pushing br_cglarv_sperm.txt...
-parsing 2396B0BE...
-finished br_cglarv_sperm.txt
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[469]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="n">out</span><span class="o">=</span><span class="s">&quot;day3&quot;</span>
-<span class="n">r1</span><span class="o">=</span><span class="s">&quot;T1D3&quot;</span>
-<span class="n">r2</span><span class="o">=</span><span class="s">&quot;T3D3&quot;</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[470]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([{r2}ratio]+[{r1}ratio])/2 as mean_{out} FROM [sr320@washington.edu].[sqlr_{r1}.txt]{r1} inner join [sr320@washington.edu].[sqlr_{r2}.txt]{r2} on {r1}.loci={r2}.loci where [{r1}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2) and [{r2}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2)&quot;</span> -f tsv -o br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>wc -l br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>head br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>singleupload.py br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-  108870 br_cglarv_day3.txt
-
-
-
-
-
-
-
-
-
-
-processing chunk line 0 to 108870 (0.104866027832 s elapsed)
-pushing br_cglarv_day3.txt...
-parsing 876A9D68...
-finished br_cglarv_day3.txt
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[471]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="n">out</span><span class="o">=</span><span class="s">&quot;day5&quot;</span>
-<span class="n">r1</span><span class="o">=</span><span class="s">&quot;T1D5&quot;</span>
-<span class="n">r2</span><span class="o">=</span><span class="s">&quot;T3D5&quot;</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[477]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, ([{r2}ratio]+[{r1}ratio])/2 as mean_{out} FROM [sr320@washington.edu].[sqlr_{r1}.txt]{r1} inner join [sr320@washington.edu].[sqlr_{r2}.txt]{r2} on {r1}.loci={r2}.loci where [{r1}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2) and [{r2}ratio]-(([{r2}ratio]+[{r1}ratio])/2) &lt; abs(.2)&quot;</span> -f tsv -o br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>wc -l br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>head br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-<span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>singleupload.py br_cglarv_<span class="o">{</span>out<span class="o">}</span>.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-  302492 br_cglarv_day5.txt
-
-
-
-
-
-
-
-
-
-
-processing chunk line 0 to 302492 (0.181667089462 s elapsed)
-pushing br_cglarv_day5.txt...
-parsing A941BD6C...
-finished br_cglarv_day5.txt
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[473]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT * FROM [sr320@washington.edu].[br_cglarv_sperm.txt]sperm inner join [sr320@washington.edu].[br_cglarv_day3.txt]d3 on sperm.loci=d3.loci inner join [sr320@washington.edu].[br_cglarv_day5.txt]d5 on sperm.loci=d5.loci&quot;</span> -f tsv -o br_joinall.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
 In&nbsp;[476]:
 </div>
 <div class="inner_cell">
@@ -8516,21 +8166,6 @@ In&nbsp;[475]:
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[478]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>python <span class="o">{</span>pt<span class="o">}</span>fetchdata.py -s <span class="s2">&quot;SELECT *, sperm.mean_sperm-d3.mean_day3 as &#39;s-3&#39;, sperm.mean_sperm-d5.mean_day5 as &#39;s-5&#39;, d3.mean_day3-d5.mean_day5 as &#39;3-5&#39; FROM [sr320@washington.edu].[br_cglarv_sperm.txt]sperm inner join [sr320@washington.edu].[br_cglarv_day3.txt]d3 on sperm.loci=d3.loci inner join [sr320@washington.edu].[br_cglarv_day5.txt]d5 on sperm.loci=d5.loci where abs(sperm.mean_sperm-d3.mean_day3) &gt; 0.4 or abs(sperm.mean_sperm-d5.mean_day5) &gt; 0.4 or abs(d3.mean_day3-d5.mean_day5) &gt; 0.4&quot;</span> -f tsv -o DML_development.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
 In&nbsp;[479]:
 </div>
 <div class="inner_cell">
@@ -8559,84 +8194,6 @@ In&nbsp;[479]:
 
 
 
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[481]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>wc -l DML_development.txt
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-     388 DML_development.txt
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[482]:
-</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class="highlight"><pre><span class="o">!</span>awk <span class="s1">&#39;{print $1}&#39;</span> DML_development.txt &gt; cglarv_dd_a
-<span class="o">!</span>tail -n +2 cglarv_dd_a &gt; cglarv_dd_b
-<span class="o">!</span>tr <span class="s1">&#39;.&#39;</span> <span class="s2">&quot;\t&quot;</span> &lt;cglarv_dd_b&gt; cglarv_dd_c
-<span class="o">!</span>awk <span class="s1">&#39;{print $1, $2, ($2+1), &quot;DML_dev&quot; }&#39;</span> cglarv_dd_c  &gt; cglarv_dd_d
-<span class="o">!</span>tr <span class="s1">&#39; &#39;</span> <span class="s2">&quot;\t&quot;</span> &lt;cglarv_dd_d&gt; cglarv_development_differ.bed
-<span class="o">!</span>head cglarv_development_differ.bed
-<span class="o">!</span>wc -l cglarv_development_differ.bed
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-C22666	609	610	DML_dev
-C22666	624	625	DML_dev
-C24478	2098	2099	DML_dev
-C24478	2120	2121	DML_dev
-C24628	2236	2237	DML_dev
-C24628	473	474	DML_dev
-C26614	3295	3296	DML_dev
-C26938	1051	1052	DML_dev
-C27500	1245	1246	DML_dev
-C27928	1457	1458	DML_dev
-     387 cglarv_development_differ.bed
 
 </pre>
 </div>
